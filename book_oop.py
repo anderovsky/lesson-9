@@ -1,29 +1,61 @@
-class Book:
-    def __init__(self, name, author, ISBN, year):
-        self.name = name
-        self.author = author
-        self.ISBN = ISBN
-        self.year = year
-        self.available = True
+class Kniha:
+    def __init__(self, nazov: str, autor: str, isbn: str, rok_vydania: int):
+        self.nazov = nazov
+        self.autor = autor
+        self.isbn = isbn
+        self.rok_vydania = rok_vydania
+        self.dostupna = True
+
+    def vypozicat(self):
+        if self.dostupna:
+            self.dostupna = False
+            return True
+        return False
+
+    def vratit(self):
+        self.dostupna = True
 
     def __str__(self):
-        return f"{self.name} / autor {self.author} / vydanie z roku {self.year}"
+        return f"{self.nazov} ({self.rok_vydania}) - {self.autor} [ISBN: {self.isbn}] {'Dostupná' if self.dostupna else 'Vypožičaná'}"
 
-class Library:
+
+class Kniznica:
     def __init__(self):
-        self.books = []
+        self.knihy = []
 
-    def add_book(self, book):
-        self.books.append(book)
+    def pridat_knihu(self, kniha: Kniha):
+        self.knihy.append(kniha)
 
-    def available_books(self):
-        return [str(k) for k in self.books if k.available]
+    def vyhladat_podla_nazvu(self, nazov: str):
+        return [k for k in self.knihy if nazov.lower() in k.nazov.lower()]
 
-kniznica = Library()
-kniha1 = Book(name="Harry Potter", author="Rowling", ISBN="123", year=1998)
-kniha2 = Book(name="Pan prstenov", author="Tolkien", ISBN="345", year=1990)
-kniha3 = Book(name="Dejiny", author="Zamarovský", ISBN="678", year=1980)
+    def vypozicat_knihu(self, isbn: str):
+        for kniha in self.knihy:
+            if kniha.isbn == isbn and kniha.dostupna:
+                return kniha.vypozicat()
+        return False
 
-kniznica.add_book(kniha1)
+    def vratit_knihu(self, isbn: str):
+        for kniha in self.knihy:
+            if kniha.isbn == isbn and not kniha.dostupna:
+                kniha.vratit()
+                return True
+        return False
 
-print(kniznica)
+    def zobraz_dostupne_knihy(self):
+        return [str(k) for k in self.knihy if k.dostupna]
+
+
+# Príklad použitia
+kniznica = Kniznica()
+kniha1 = Kniha("1984", "George Orwell", "123456789", 1949)
+kniha2 = Kniha("Malý princ", "Antoine de Saint-Exupéry", "987654321", 1943)
+
+kniznica.pridat_knihu(kniha1)
+kniznica.pridat_knihu(kniha2)
+
+print("Dostupné knihy:", kniznica.zobraz_dostupne_knihy())
+kniznica.vypozicat_knihu("123456789")
+print("Po vypožičaní:", kniznica.zobraz_dostupne_knihy())
+kniznica.vratit_knihu("123456789")
+print("Po vrátení:", kniznica.zobraz_dostupne_knihy())
